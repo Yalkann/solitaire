@@ -2,7 +2,10 @@ class Stack:
     def __init__(self, list):
         self.stack = list.copy()
 
-    def getStack(self, index):
+    def __str__(self):
+        return str(self.stack)
+
+    def getList(self, index):
         if len(self.stack) == 0:
             return []
         if index < len(self.stack) and index >= 0:
@@ -17,7 +20,7 @@ class Stack:
 
     def remove(self, index):
         if len(self.stack) == 0:
-            raise Exception("Cannot remove a sub-stack from an empty stack.")
+            raise Exception("Cannot remove a stack sub-list from an empty stack.")
         if index < len(self.stack) and index >= 0:
             for i in range(len(self.stack) - index):
                 del self.stack[-1]

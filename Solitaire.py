@@ -1,7 +1,6 @@
-from src.Deck import *
+from src.Game import *
 
 if __name__ == "__main__":
-    deck = Deck()
-    deck.shuffle()
-    test = [1, 2, 3, 4, 5, 6]
-    print(str(test))
+    g = Game()
+    g.moveStack(1, 1, 0)
+    g.printBoard()

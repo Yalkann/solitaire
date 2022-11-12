@@ -46,7 +46,7 @@ class TestDeck(unittest.TestCase):
             )
 
     def test_is_empty_after_removing_all_cards(self):
-        for i in range(52):
+        for _ in range(52):
             self.assertFalse(
                 self.d.isEmpty(),
                 "Decks should not be empty before removing every cards.",
@@ -57,7 +57,7 @@ class TestDeck(unittest.TestCase):
         )
 
     def test_cannot_remove_card_from_empty_deck(self):
-        for i in range(52):
+        for _ in range(52):
             self.d.removeTopCard()
         with self.assertRaises(Exception):
             self.d.removeTopCard(), "Should not be able to remove a card from an empty deck."
@@ -74,7 +74,7 @@ class TestDeck(unittest.TestCase):
         card = self.d.getTopCard()
         self.d.removeTopCard()
         self.d.sendToBack(card)
-        for i in range(51):
+        for _ in range(51):
             self.d.removeTopCard()
         self.assertEqual(
             card,

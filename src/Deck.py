@@ -10,6 +10,12 @@ class Deck:
                 newCard = Card(v, s)
                 self.deck.append(newCard)
 
+    def __str__(self):
+        str = "Deck size: " + str(len(self.deck)) + "\n"
+        for c in self.deck:
+            str += "(" + str(c[0]) + "," + str(c[1]) + ")" + "\n"
+        return str
+
     def shuffle(self):
         rd.shuffle(self.deck)
 

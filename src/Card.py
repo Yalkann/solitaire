@@ -6,12 +6,15 @@ class Card:
         self.value = None
         self.suit = None
         if suit not in SUITS:
-            quit("Fatal error: No such card suit name.")
+            raise Exception("Fatal error: No such card suit name.")
         elif value < 1 or value > 13:
-            quit("Fatal error: No such card value.")
+            raise Exception("Fatal error: No such card value.")
         else:
             self.value = value
             self.suit = suit
+
+    def __str__(self):
+        return "(" + str(self.value) + "," + str(self.suit) + ")"
 
     def getCard(self):
         return (self.value, self.suit)
