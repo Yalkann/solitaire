@@ -7,7 +7,12 @@ class TextInterface(Interface):
         tm = TurnManager()
         while not (game.isFinished()):
             game.printBoard()
-            actions = tm.getActions()
+            legalMove = None
+            while legalMove == None or legalMove == False:
+                actions = tm.getActions()
+                legalMove = game.move(actions)
+                if not (legalMove):
+                    print("Error: illegal Move.")
 
         if game.isWon():
             print("\nGG\n")

@@ -25,7 +25,7 @@ class TestDeck(unittest.TestCase):
         for card in self.d.getDeck():
             c = card.getCard()
             self.assertTrue(
-                c[0] >= 1 and c[0] <= 13 and c[1] in SUITS,
+                c[0] >= 1 and c[0] <= 13 and c[1] in SUITES,
                 "Decks should contain no illegal cards.",
             )
 

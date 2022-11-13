@@ -5,7 +5,7 @@ import random as rd
 class Deck:
     def __init__(self):
         self.deck = []
-        for s in SUITS:
+        for s in SUITES:
             for v in range(1, 14):
                 newCard = Card(v, s)
                 self.deck.append(newCard)

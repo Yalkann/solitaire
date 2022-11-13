@@ -6,6 +6,7 @@ class Board:
     def __init__(self):
         self.stock = Deck()
         self.stock.shuffle()
+        self.topCardRevealed = False
         self.table = [Stack([]) for _ in range(7)]
         self.hiddenTable = [[] for _ in range(7)]
         self.foundation = [Stack([]) for _ in range(4)]
@@ -20,28 +21,37 @@ class Board:
             self.table[i].add(cards)
             self.hiddenTable[i][-1] = False
 
-    def __removeFromHiddenTable(self, tableIndex, cardIndex):
+    def removeFromHiddenTable(self, tableIndex, cardIndex):
         curHiddenTable = self.hiddenTable[tableIndex]
         for _ in range(len(curHiddenTable) - cardIndex):
             self.hiddenTable[tableIndex].pop()
         if len(curHiddenTable) > 0:
             curHiddenTable[-1] = False
 
-    def __addToHiddenTable(self, tableIndex, stackLen):
+    def addToHiddenTable(self, tableIndex, stackLen):
         self.hiddenTable[tableIndex] += [False for _ in range(stackLen)]
 
-    def __isHidden(self, tableIndex, index):
+    def isHidden(self, tableIndex, index):
         return self.hiddenTable[tableIndex][index]
 
-    def __moveStackToStack(self, stackSource, stackDest, cardIndex):
+    def moveStackToStack(self, stackSource, stackDest, cardIndex):
         list = stackSource.getListFromStack(cardIndex)
         stackSource.remove(cardIndex)
         stackDest.add(list)
 
-    def printBoard(self):
-        print("Stock size: ", self.stock.getDeckLen())
+    def moveCardToStack(self, card, stackDest):
+        stackDest.add([card])
+        self.stock.removeTopCard()
 
-        print("waste: ", self.waste)
+    def isTopCardRevealed(self):
+        return self.topCardRevealed
+
+    def printBoard(self):
+        print("Stock: ")
+        print("[ ", end="")
+        if self.topCardRevealed:
+            print(self.stock.getTopCard(), end="")
+        print(" ]")
 
         print("foundation: ")
         for foundStack in self.foundation:

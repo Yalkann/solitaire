@@ -1,16 +1,18 @@
-SUITS = (
+SUITES = (
     "Clubs",
     "Hearts",
     "Spades",
     "Diamonds",
 )
+RED = ("Hearts", "Diamonds")
+BLACK = ("Clubs", "Spades")
 
 
 class Card:
     def __init__(self, value, suit):
         self.value = None
         self.suit = None
-        if suit not in SUITS:
+        if suit not in SUITES:
             raise Exception("Fatal error: No such card suit name.")
         elif value < 1 or value > 13:
             raise Exception("Fatal error: No such card value.")
