@@ -20,22 +20,23 @@ class Board:
             self.table[i].add(cards)
             self.hiddenTable[i][-1] = False
 
-    def removeFromHiddenTable(self, tableIndex, cardIndex):
+    def __removeFromHiddenTable(self, tableIndex, cardIndex):
         curHiddenTable = self.hiddenTable[tableIndex]
         for _ in range(len(curHiddenTable) - cardIndex):
             self.hiddenTable[tableIndex].pop()
         if len(curHiddenTable) > 0:
             curHiddenTable[-1] = False
 
-    def addToHiddenTable(self, tableIndex, stackLen):
+    def __addToHiddenTable(self, tableIndex, stackLen):
         self.hiddenTable[tableIndex] += [False for _ in range(stackLen)]
 
-    def moveStack(self, tableSourceIndex, cardIndex, tableDestIndex):
-        stack = self.table[tableSourceIndex].getList(cardIndex)
-        self.table[tableSourceIndex].remove(cardIndex)
-        self.removeFromHiddenTable(tableSourceIndex, cardIndex)
-        self.table[tableDestIndex].add(stack)
-        self.addToHiddenTable(tableDestIndex, len(stack))
+    def __isHidden(self, tableIndex, index):
+        return self.hiddenTable[tableIndex][index]
+
+    def __moveStackToStack(self, stackSource, stackDest, cardIndex):
+        list = stackSource.getListFromStack(cardIndex)
+        stackSource.remove(cardIndex)
+        stackDest.add(list)
 
     def printBoard(self):
         print("Stock size: ", self.stock.getDeckLen())
@@ -45,7 +46,7 @@ class Board:
         print("foundation: ")
         for foundStack in self.foundation:
             print("[ ", end="")
-            foundList = foundStack.getList(0)
+            foundList = foundStack.getListFromStack(0)
             if len(foundList) > 0:
                 print(foundList[-1], end="")
             print(" ]")
@@ -53,7 +54,7 @@ class Board:
         print("Table: ")
         for tableStackIndex in range(len(self.table)):
             print("[ ", end="")
-            tableList = self.table[tableStackIndex].getList(0)
+            tableList = self.table[tableStackIndex].getListFromStack(0)
             if len(tableList) > 0:
                 for tableIndex in range(len(tableList)):
                     if self.hiddenTable[tableStackIndex][tableIndex]:

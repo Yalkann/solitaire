@@ -5,7 +5,7 @@ class Stack:
     def __str__(self):
         return str(self.stack)
 
-    def getList(self, index):
+    def getListFromStack(self, index):
         if len(self.stack) == 0:
             return []
         if index < len(self.stack) and index >= 0:

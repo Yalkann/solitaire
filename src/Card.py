@@ -1,4 +1,9 @@
-SUITS = ("Spades", "Hearts", "Diamonds", "Clubs")
+SUITS = (
+    "Clubs",
+    "Hearts",
+    "Spades",
+    "Diamonds",
+)
 
 
 class Card:

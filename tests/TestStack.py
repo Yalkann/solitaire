@@ -17,7 +17,7 @@ class TestStack(unittest.TestCase):
     def test_get_stack_list_returns_whole_stack_list(self):
         self.assertEqual(
             self.l,
-            self.s.getList(0),
+            self.s.getListFromStack(0),
             "Stack lists should be equal to the list the stack was created from.",
         )
 
@@ -25,13 +25,13 @@ class TestStack(unittest.TestCase):
         id = rd.randint(0, 99)
         self.assertEqual(
             self.l[id::],
-            self.s.getList(id),
+            self.s.getListFromStack(id),
             "Stack sub-lists should be equal to the original sub-list starting from the same index.",
         )
 
     def test_get_stack_sub_list_with_incorrect_index(self):
         with self.assertRaises(IndexError):
-            self.s.getList(
+            self.s.getListFromStack(
                 100
             ), "Index should be greater than or equal to 0 and smaller than the stack's length."
             self.getStack(
@@ -40,14 +40,14 @@ class TestStack(unittest.TestCase):
 
     def test_get_stack_sub_list_from_empty_stack(self):
         s = Stack([])
-        self.assertEqual(s.getList(0), [], "Should get an empty list")
+        self.assertEqual(s.getListFromStack(0), [], "Should get an empty list")
 
     def test_remove_from_stack(self):
         id = rd.randint(0, 99)
         self.s.remove(id)
         self.assertEqual(
             self.l[0:id],
-            self.s.getList(0),
+            self.s.getListFromStack(0),
             "Stack sub-lists should be equal to the original sub-list ending at the same index.",
         )
 
