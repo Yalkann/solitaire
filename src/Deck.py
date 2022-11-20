@@ -40,7 +40,7 @@ class Deck:
         else:
             raise Exception("Cannot remove a card from an empty deck.")
 
-    def sendToBack(self, card):
+    def addToBack(self, card):
         if card not in self.deck:
             self.deck.append(card)
         else:

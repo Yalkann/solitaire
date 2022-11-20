@@ -10,9 +10,10 @@ class TextInterface(Interface):
             legalMove = None
             while legalMove == None or legalMove == False:
                 actions = tm.getActions()
-                legalMove = game.move(actions)
-                if not (legalMove):
-                    print("Error: illegal Move.")
+                moveError = game.move(actions)
+                legalMove = moveError == None
+                if moveError != None:
+                    print(moveError, ": illegal Move.")
 
         if game.isWon():
             print("\nGG\n")

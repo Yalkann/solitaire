@@ -73,7 +73,7 @@ class TestDeck(unittest.TestCase):
     def test_card_sent_to_back_of_deck(self):
         card = self.d.getTopCard()
         self.d.removeTopCard()
-        self.d.sendToBack(card)
+        self.d.addToBack(card)
         for _ in range(51):
             self.d.removeTopCard()
         self.assertEqual(
@@ -85,6 +85,6 @@ class TestDeck(unittest.TestCase):
     def test_cannot_send_duplicate_to_back_of_deck(self):
         card = self.d.getTopCard()
         with self.assertRaises(Exception):
-            self.d.sendToBack(
+            self.d.addToBack(
                 card
             ), "Should not be able to send duplicate cards to the back of the deck."

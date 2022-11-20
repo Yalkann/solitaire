@@ -9,19 +9,25 @@ BLACK = ("Clubs", "Spades")
 
 
 class Card:
-    def __init__(self, value, suit):
+    def __init__(self, value, suite):
         self.value = None
-        self.suit = None
-        if suit not in SUITES:
+        self.suite = None
+        if suite not in SUITES:
             raise Exception("Fatal error: No such card suit name.")
         elif value < 1 or value > 13:
             raise Exception("Fatal error: No such card value.")
         else:
             self.value = value
-            self.suit = suit
+            self.suite = suite
 
     def __str__(self):
-        return "(" + str(self.value) + "," + str(self.suit) + ")"
+        return "(" + str(self.value) + "," + str(self.suite) + ")"
 
     def getCard(self):
-        return (self.value, self.suit)
+        return (self.value, self.suite)
+
+    def getValue(self):
+        return self.value
+
+    def getSuite(self):
+        return self.suite

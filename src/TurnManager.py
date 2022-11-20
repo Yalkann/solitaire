@@ -1,17 +1,14 @@
 class TurnManager:
-    def __init__(self):
-        pass
-
     def getActions(self):
         sourceStack, sourceStackIndex, cardIndex = None, None, None
 
-        while sourceStack == None or sourceStack not in ["S", "T", "F"]:
+        while sourceStack == None or sourceStack not in ["D", "S", "T", "F"]:
             sourceStack = input(
-                "Select where to pick a stack from: S (Stock), T (Table), F (Foundation).\n"
+                "Select where to pick from: D (Draw), S (Stock), T (Table), F (Foundation).\n"
             )
-            if sourceStack not in ["S", "T", "F"]:
+            if sourceStack not in ["D", "S", "T", "F"]:
                 print(
-                    "Error: Expected S (Stock), T (Table) or F (Foundation) but got ",
+                    "Error: Expected D (Draw), S (Stock), T (Table) or F (Foundation) but got ",
                     sourceStack,
                     ".",
                 )

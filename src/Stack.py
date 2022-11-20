@@ -15,6 +15,15 @@ class Stack:
                 "Index should be greater than or equal to 0 and smaller than the stack's length."
             )
 
+    def getLastElement(self):
+        if len(self.stack) > 0:
+            return self.stack[-1]
+        else:
+            raise Exception("Cannot get the last element from an empty stack.")
+
+    def getLen(self):
+        return len(self.stack)
+
     def add(self, list):
         self.stack += list
 

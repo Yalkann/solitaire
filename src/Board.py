@@ -23,34 +23,68 @@ class Board:
 
     def removeFromHiddenTable(self, tableIndex, cardIndex):
         curHiddenTable = self.hiddenTable[tableIndex]
-        for _ in range(len(curHiddenTable) - cardIndex):
-            self.hiddenTable[tableIndex].pop()
-        if len(curHiddenTable) > 0:
-            curHiddenTable[-1] = False
+        if cardIndex >= 0:
+            for _ in range(len(curHiddenTable) - cardIndex):
+                self.hiddenTable[tableIndex].pop()
+            if len(curHiddenTable) > 0:
+                curHiddenTable[-1] = False
 
     def addToHiddenTable(self, tableIndex, stackLen):
-        self.hiddenTable[tableIndex] += [False for _ in range(stackLen)]
+        for _ in range(stackLen):
+            self.hiddenTable[tableIndex].append(False)
 
     def isHidden(self, tableIndex, index):
         return self.hiddenTable[tableIndex][index]
 
-    def moveStackToStack(self, stackSource, stackDest, cardIndex):
-        list = stackSource.getListFromStack(cardIndex)
-        stackSource.remove(cardIndex)
-        stackDest.add(list)
-
-    def moveCardToStack(self, card, stackDest):
-        stackDest.add([card])
-        self.stock.removeTopCard()
-
     def isTopCardRevealed(self):
         return self.topCardRevealed
 
+    def getStock(self):
+        return self.stock
+
+    def getWaste(self):
+        return self.waste
+
+    def getTable(self):
+        return self.table
+
+    def getFoundation(self):
+        return self.foundation
+
+    def switchTopCardRevealed(self):
+        self.topCardRevealed = not (self.topCardRevealed)
+
+    def moveStackToStack(self, stackSource, stackDest, cardIndex):
+        list = stackSource.getListFromStack(cardIndex)
+        stackDest.add(list)
+        stackSource.remove(cardIndex)
+
+    def moveStockCardToStack(self, stackDest):
+        if self.isTopCardRevealed():
+            card = self.stock.getTopCard()
+            stackDest.add([card])
+            self.stock.removeTopCard()
+            self.switchTopCardRevealed()
+        else:
+            raise Exception(
+                "Cannot move the top card of the stock if it is not revealed."
+            )
+
     def printBoard(self):
         print("Stock: ")
+        stockLen = self.stock.getDeckLen()
+        if self.topCardRevealed:
+            stockLen -= 1
+        print(stockLen, " card(s) remaining.")
         print("[ ", end="")
         if self.topCardRevealed:
             print(self.stock.getTopCard(), end="")
+        print(" ]")
+
+        print("Waste:")
+        print("[ ", end="")
+        if self.waste.getLen() > 0:
+            print("H", end="")
         print(" ]")
 
         print("foundation: ")
