@@ -31,8 +31,6 @@ class Deck:
     def getTopCard(self):
         if len(self.deck) > 0:
             return self.deck[0]
-        else:
-            return None
 
     def removeTopCard(self):
         if len(self.deck) > 0:

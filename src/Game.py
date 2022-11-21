@@ -37,7 +37,7 @@ class Game(Board):
 
     def move(self, actions):
         if actions[0] == "D":
-            if not (self.getStock().isEmpty()):
+            if not (self.getStock().isEmpty() and self.getWaste().isEmpty()):
                 self.draw()
                 self.nbTurns += 1
             else:
@@ -115,49 +115,6 @@ class Game(Board):
         else:
             raise Exception("Cannot draw a card from an empty stock.")
 
-    def getStockAndWasteMoves(self):
-        stock = self.getStock()
-        waste = self.getWaste()
-        moves = []
-
-        for card in stock.getDeck() + waste.getListFromStack(0):
-            stackDest = self.getClosestStack(card, True)
-            if stackDest != None:
-                moves.append(["S", None, None])
-        return moves
-
-    def getTableMoves(self):
-        table = self.getTable()
-        moves = []
-        for stackIndex in range(len(table)):
-            for cardIndex in range(table[stackIndex].getLen()):
-                if not (self.isHidden(stackIndex, cardIndex)):
-                    list = table[stackIndex].getListFromStack(cardIndex)
-                    stackDest = self.getClosestStack(list[0], len(list) == 1)
-                    if stackDest != None:
-                        moves.append(["T", stackIndex, cardIndex])
-        return moves
-
-    def getFoundationMoves(self):
-        foundation = self.getFoundation()
-        moves = []
-
-        for stackIndex in range(len(foundation)):
-            if foundation[stackIndex].getLen() > 0:
-                stackDest = self.getClosestStack(
-                    foundation[stackIndex].getLastElement(), True
-                )
-                if stackDest != None:
-                    moves.append(["F", stackIndex, None])
-        return moves
-
-    def getAllMoves(self):
-        moves = []
-        moves += self.getStockAndWasteMoves()
-        moves += self.getTableMoves()
-        # moves += self.getFoundationMoves()
-        return moves
-
     def isWon(self):
         for stack in self.getFoundation():
             if stack.getLen() != 13:
@@ -165,7 +122,4 @@ class Game(Board):
         return True
 
     def isFinished(self):
-        moves = self.getAllMoves()
-        if len(moves) == 0:
-            self.setGameTime()
-        return len(moves) == 0
+        pass

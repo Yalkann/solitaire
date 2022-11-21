@@ -57,6 +57,9 @@ class Board:
     def isHidden(self, tableIndex, index):
         return self.hiddenTable[tableIndex][index]
 
+    def getHiddenTable(self):
+        return self.hiddenTable
+
     def isTopCardRevealed(self):
         return self.topCardRevealed
 
