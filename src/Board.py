@@ -1,5 +1,6 @@
 from src.Deck import *
 from src.Stack import *
+import time
 
 
 class Board:
@@ -11,6 +12,10 @@ class Board:
         self.hiddenTable = [[] for _ in range(7)]
         self.foundation = [Stack([]) for _ in range(4)]
         self.waste = Stack([])
+        self.history = []
+        self.nbTurns = 0
+        self.startTime = time.time()
+        self.gameTime = None
 
         for i in range(7):
             cards = []
@@ -20,6 +25,22 @@ class Board:
                 self.hiddenTable[i].append(True)
             self.table[i].add(cards)
             self.hiddenTable[i][-1] = False
+
+    def setGameTime(self):
+        endTime = time.time()
+        self.gameTime = endTime - self.startTime
+
+    def getGameTime(self):
+        return self.gameTime
+
+    def getNbTurns(self):
+        return self.nbTurns
+
+    def getHistory(self):
+        return self.history
+
+    def appendHistory(self, action):
+        self.history.append(action)
 
     def removeFromHiddenTable(self, tableIndex, cardIndex):
         curHiddenTable = self.hiddenTable[tableIndex]
@@ -54,12 +75,12 @@ class Board:
     def switchTopCardRevealed(self):
         self.topCardRevealed = not (self.topCardRevealed)
 
-    def moveStackToStack(self, stackSource, stackDest, cardIndex):
+    def moveStackToStack(self, stackSource: Stack, stackDest: Stack, cardIndex):
         list = stackSource.getListFromStack(cardIndex)
         stackDest.add(list)
         stackSource.remove(cardIndex)
 
-    def moveStockCardToStack(self, stackDest):
+    def moveStockCardToStack(self, stackDest: Stack):
         if self.isTopCardRevealed():
             card = self.stock.getTopCard()
             stackDest.add([card])
@@ -71,33 +92,35 @@ class Board:
             )
 
     def printBoard(self):
+        print("\n")
+        print("Turn", self.getNbTurns())
         print("Stock: ")
         stockLen = self.stock.getDeckLen()
         if self.topCardRevealed:
             stockLen -= 1
         print(stockLen, " card(s) remaining.")
-        print("[ ", end="")
+        print("  [ ", end="")
         if self.topCardRevealed:
             print(self.stock.getTopCard(), end="")
         print(" ]")
 
         print("Waste:")
-        print("[ ", end="")
+        print("  [ ", end="")
         if self.waste.getLen() > 0:
             print("H", end="")
         print(" ]")
 
         print("foundation: ")
-        for foundStack in self.foundation:
-            print("[ ", end="")
-            foundList = foundStack.getListFromStack(0)
+        for stackIndex in range(len(self.foundation)):
+            print(stackIndex, "[ ", end="")
+            foundList = self.foundation[stackIndex].getListFromStack(0)
             if len(foundList) > 0:
                 print(foundList[-1], end="")
             print(" ]")
 
         print("Table: ")
         for tableStackIndex in range(len(self.table)):
-            print("[ ", end="")
+            print(tableStackIndex, "[ ", end="")
             tableList = self.table[tableStackIndex].getListFromStack(0)
             if len(tableList) > 0:
                 for tableIndex in range(len(tableList)):

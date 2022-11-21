@@ -2,7 +2,7 @@ from src.Board import *
 
 
 class Game(Board):
-    def areOppositeColor(self, card1, card2):
+    def areOppositeColor(self, card1: Card, card2: Card):
         return (
             card1.getSuite() in RED
             and card2.getSuite() in BLACK
@@ -10,16 +10,16 @@ class Game(Board):
             and card2.getSuite() in RED
         )
 
-    def getClosestStack(self, card, isSingle):
+    def getClosestStack(self, card: Card, isSingle):
         if isSingle:
             for stack in self.getFoundation():
                 if stack.getLen() == 0:
                     if card.getValue() == 1:
                         return (stack, None)
                 else:
-                    lastCard = stack.getLastElement()
+                    lastCard: Card = stack.getLastElement()
                     if (
-                        card.getValue() == lastCard.getValue() - 1
+                        card.getValue() == lastCard.getValue() + 1
                         and card.getSuite() == lastCard.getSuite()
                     ):
                         return (stack, None)
@@ -39,18 +39,20 @@ class Game(Board):
         if actions[0] == "D":
             if not (self.getStock().isEmpty()):
                 self.draw()
+                self.nbTurns += 1
             else:
                 return "stockEmptyError"
 
         elif actions[0] == "S":
             if self.isTopCardRevealed():
-                (stackDest, hiddenTableIndex) = self.getClosestStack(
-                    self.getStock().getTopCard(), True
-                )
-                if stackDest != None:
+                closestStack = self.getClosestStack(self.getStock().getTopCard(), True)
+                if closestStack != None:
+                    stackDest = closestStack[0]
+                    hiddenTableIndex = closestStack[1]
                     self.moveStockCardToStack(stackDest)
+                    self.nbTurns += 1
                     if hiddenTableIndex != None:
-                        self.addToHiddenTable(hiddenTableIndex, len(list))
+                        self.addToHiddenTable(hiddenTableIndex, 1)
                 else:
                     return "stackDestError"
             else:
@@ -61,11 +63,14 @@ class Game(Board):
             stackSource = foundation[actions[1]]
             if stackSource.getLen() > 0:
                 card = stackSource.getLastElement()
-                (stackDest, hiddenTableIndex) = self.getClosestStack(card, True)
-                if stackDest != None:
+                closestStack = self.getClosestStack(card, True)
+                if closestStack != None:
+                    stackDest = closestStack[0]
+                    hiddenTableIndex = closestStack[1]
                     self.moveStackToStack(
                         stackSource, stackDest, stackSource.getLen() - 1
                     )
+                    self.nbTurns += 1
                     if hiddenTableIndex != None:
                         self.addToHiddenTable(hiddenTableIndex, len(list))
                 return "stackDestError"
@@ -79,15 +84,15 @@ class Game(Board):
                 cardIndex = actions[2]
                 if cardIndex < stackSource.getLen():
                     list = stackSource.getListFromStack(cardIndex)
-                    singleCard = len(list) == 1
-                    (stackDest, hiddenTableIndex) = self.getClosestStack(
-                        list[0], singleCard
-                    )
-                    if stackDest != None:
+                    closestStack = self.getClosestStack(list[0], len(list) == 1)
+                    if closestStack != None:
+                        stackDest = closestStack[0]
+                        hiddenTableIndex = closestStack[1]
                         self.moveStackToStack(stackSource, stackDest, cardIndex)
+                        self.nbTurns += 1
                         if hiddenTableIndex != None:
                             self.addToHiddenTable(hiddenTableIndex, len(list))
-                            self.removeFromHiddenTable(tableIndex, cardIndex)
+                        self.removeFromHiddenTable(tableIndex, cardIndex)
 
                     else:
                         return "stackDestError"
@@ -110,6 +115,49 @@ class Game(Board):
         else:
             raise Exception("Cannot draw a card from an empty stock.")
 
+    def getStockAndWasteMoves(self):
+        stock = self.getStock()
+        waste = self.getWaste()
+        moves = []
+
+        for card in stock.getDeck() + waste.getListFromStack(0):
+            stackDest = self.getClosestStack(card, True)
+            if stackDest != None:
+                moves.append(["S", None, None])
+        return moves
+
+    def getTableMoves(self):
+        table = self.getTable()
+        moves = []
+        for stackIndex in range(len(table)):
+            for cardIndex in range(table[stackIndex].getLen()):
+                if not (self.isHidden(stackIndex, cardIndex)):
+                    list = table[stackIndex].getListFromStack(cardIndex)
+                    stackDest = self.getClosestStack(list[0], len(list) == 1)
+                    if stackDest != None:
+                        moves.append(["T", stackIndex, cardIndex])
+        return moves
+
+    def getFoundationMoves(self):
+        foundation = self.getFoundation()
+        moves = []
+
+        for stackIndex in range(len(foundation)):
+            if foundation[stackIndex].getLen() > 0:
+                stackDest = self.getClosestStack(
+                    foundation[stackIndex].getLastElement(), True
+                )
+                if stackDest != None:
+                    moves.append(["F", stackIndex, None])
+        return moves
+
+    def getAllMoves(self):
+        moves = []
+        moves += self.getStockAndWasteMoves()
+        moves += self.getTableMoves()
+        # moves += self.getFoundationMoves()
+        return moves
+
     def isWon(self):
         for stack in self.getFoundation():
             if stack.getLen() != 13:
@@ -117,4 +165,7 @@ class Game(Board):
         return True
 
     def isFinished(self):
-        return self.isWon()
+        moves = self.getAllMoves()
+        if len(moves) == 0:
+            self.setGameTime()
+        return len(moves) == 0

@@ -1,7 +1,8 @@
+from src.Game import *
 from src.TextInterface import *
-
+from src.AI_algo import *
 
 if __name__ == "__main__":
     game = Game()
-    textInter = TextInterface()
-    textInter.run(game)
+    ai = AI_algo()
+    textInter = TextInterface(game, ai)
