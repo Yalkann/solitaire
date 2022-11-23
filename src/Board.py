@@ -1,6 +1,6 @@
 from src.Deck import *
 from src.Stack import *
-import time
+from time import perf_counter
 
 
 class Board:
@@ -14,7 +14,7 @@ class Board:
         self.waste = Stack([])
         self.history = []
         self.nbTurns = 0
-        self.startTime = time.time()
+        self.startTime = perf_counter()
         self.gameTime = None
 
         for i in range(7):
@@ -27,7 +27,7 @@ class Board:
             self.hiddenTable[i][-1] = False
 
     def setGameTime(self):
-        endTime = time.time()
+        endTime = perf_counter()
         self.gameTime = endTime - self.startTime
 
     def getGameTime(self):
