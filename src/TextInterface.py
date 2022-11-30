@@ -25,5 +25,7 @@ class TextInterface(Interface):
         game.printBoard()
         if game.isWon():
             print("\nGG\n")
+            return 1
         else:
             print("\nDOMMAGE\n")
+            return 0

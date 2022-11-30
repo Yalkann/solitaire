@@ -7,4 +7,7 @@ class Interface:
         pass
 
     def __init__(self, game: Game, ai: AI = None):
-        self.run(game, ai)
+        self.result = self.run(game, ai)
+
+    def getGameResult(self):
+        return self.result

@@ -7,7 +7,6 @@ class Board:
     def __init__(self):
         self.stock = Deck()
         self.stock.shuffle()
-        self.topCardRevealed = False
         self.table = [Stack([]) for _ in range(7)]
         self.hiddenTable = [[] for _ in range(7)]
         self.foundation = [Stack([]) for _ in range(4)]
@@ -19,7 +18,7 @@ class Board:
 
         for i in range(7):
             cards = []
-            for j in range(i + 1):
+            for _ in range(i + 1):
                 cards.append(self.stock.getTopCard())
                 self.stock.removeTopCard()
                 self.hiddenTable[i].append(True)
@@ -60,9 +59,6 @@ class Board:
     def getHiddenTable(self):
         return self.hiddenTable
 
-    def isTopCardRevealed(self):
-        return self.topCardRevealed
-
     def getStock(self):
         return self.stock
 
@@ -75,20 +71,16 @@ class Board:
     def getFoundation(self):
         return self.foundation
 
-    def switchTopCardRevealed(self):
-        self.topCardRevealed = not (self.topCardRevealed)
-
     def moveStackToStack(self, stackSource: Stack, stackDest: Stack, cardIndex):
         list = stackSource.getListFromStack(cardIndex)
         stackDest.add(list)
         stackSource.remove(cardIndex)
 
-    def moveStockCardToStack(self, stackDest: Stack):
-        if self.isTopCardRevealed():
-            card = self.stock.getTopCard()
+    def moveWasteCardToStack(self, stackDest: Stack):
+        if not (self.waste.isEmpty()):
+            card = self.waste.getLastElement()
             stackDest.add([card])
-            self.stock.removeTopCard()
-            self.switchTopCardRevealed()
+            self.waste.remove(self.waste.getLen() - 1)
         else:
             raise Exception(
                 "Cannot move the top card of the stock if it is not revealed."
@@ -97,20 +89,18 @@ class Board:
     def printBoard(self):
         print("\n")
         print("Turn", self.getNbTurns())
+
         print("Stock: ")
-        stockLen = self.stock.getDeckLen()
-        if self.topCardRevealed:
-            stockLen -= 1
-        print(stockLen, " card(s) remaining.")
+        print(self.stock.getDeckLen(), " card(s) remaining.")
         print("  [ ", end="")
-        if self.topCardRevealed:
-            print(self.stock.getTopCard(), end="")
+        if not (self.stock.isEmpty()):
+            print("H", end="")
         print(" ]")
 
         print("Waste:")
         print("  [ ", end="")
         if self.waste.getLen() > 0:
-            print("H", end="")
+            print(self.waste.getLastElement(), end="")
         print(" ]")
 
         print("foundation: ")

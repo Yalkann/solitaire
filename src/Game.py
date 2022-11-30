@@ -36,20 +36,22 @@ class Game(Board):
                     return (table[stackIndex], stackIndex)
 
     def move(self, actions):
+        stock = self.getStock()
+        waste = self.getWaste()
+
         if actions[0] == "D":
-            if not (self.getStock().isEmpty() and self.getWaste().isEmpty()):
-                self.draw()
-                self.nbTurns += 1
-            else:
+            if stock.isEmpty() and waste.isEmpty():
                 return "stockEmptyError"
+            self.draw()
+            self.nbTurns += 1
 
         elif actions[0] == "S":
-            if self.isTopCardRevealed():
-                closestStack = self.getClosestStack(self.getStock().getTopCard(), True)
+            if waste.getLen() > 0:
+                closestStack = self.getClosestStack(waste.getLastElement(), True)
                 if closestStack != None:
                     stackDest = closestStack[0]
                     hiddenTableIndex = closestStack[1]
-                    self.moveStockCardToStack(stackDest)
+                    self.moveWasteCardToStack(stackDest)
                     self.nbTurns += 1
                     if hiddenTableIndex != None:
                         self.addToHiddenTable(hiddenTableIndex, 1)
@@ -104,16 +106,17 @@ class Game(Board):
     def draw(self):
         stock = self.getStock()
         waste = self.getWaste()
-        if self.isTopCardRevealed():
-            self.moveStockCardToStack(waste)
-        if not (stock.isEmpty()):
-            self.switchTopCardRevealed()
-        elif not (waste.isEmpty()):
-            for card in waste.getListFromStack(0):
-                stock.addToBack(card)
+
+        if stock.isEmpty():
+            if waste.isEmpty():
+                raise Exception("Cannot draw a card from an empty stock.")
+            for c in waste.getListFromStack(0):
+                stock.addToBack(c)
             waste.remove(0)
         else:
-            raise Exception("Cannot draw a card from an empty stock.")
+            topCard = stock.getTopCard()
+            waste.add([topCard])
+            stock.removeTopCard()
 
     def isWon(self):
         for stack in self.getFoundation():

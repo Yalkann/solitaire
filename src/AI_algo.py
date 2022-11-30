@@ -99,9 +99,7 @@ class AI_algo(AI):
         # sleep(0.01)
         # print("\nConsec Draw:", self.getConsecutiveDraw(), "\n")
 
-        if not (game.isTopCardRevealed()) and (
-            not (stock.isEmpty()) or not (waste.isEmpty())
-        ):
+        if waste.isEmpty() and not (stock.isEmpty()):
             action = ["D", None, None]
             game.appendHistory(action)
             self.incrConsecutiveDraw()
@@ -115,7 +113,7 @@ class AI_algo(AI):
                 self.resetConsecutiveDraw()
                 return tableAction
 
-        card = stock.getTopCard()
+        card = waste.getLastElement()
         if card != None:
             closestStack = game.getClosestStack(card, True)
             if closestStack == None:

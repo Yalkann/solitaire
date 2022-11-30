@@ -18,8 +18,6 @@ class Stack:
     def getLastElement(self):
         if len(self.stack) > 0:
             return self.stack[-1]
-        else:
-            raise Exception("Cannot get the last element from an empty stack.")
 
     def getLen(self):
         return len(self.stack)
