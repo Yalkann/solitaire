@@ -11,10 +11,10 @@ from TestStack import *
 
 if __name__ == "__main__":
 
-    # Running deck Tests
+    # Deck Tests
     deckTest = TestDeck()
 
-    # Running stack Tests
+    # Stack Tests
     stackTest = TestStack()
 
     unittest.main()
