@@ -101,14 +101,12 @@ class AI_algo(AI):
 
         if waste.isEmpty() and not (stock.isEmpty()):
             action = ["D", None, None]
-            game.appendHistory(action)
             self.incrConsecutiveDraw()
             return action
 
         if self.hasBoardChanged():
             tableAction = self.getTableAction(game)
             if tableAction != None:
-                game.appendHistory(tableAction)
                 self.setBoardChanged(True)
                 self.resetConsecutiveDraw()
                 return tableAction
@@ -130,5 +128,4 @@ class AI_algo(AI):
         if self.getConsecutiveDraw() >= stock.getDeckLen() + waste.getLen() + 1:
             return None
 
-        game.appendHistory(action)
         return action

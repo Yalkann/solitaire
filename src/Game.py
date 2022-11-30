@@ -35,17 +35,17 @@ class Game(Board):
                 ):
                     return (table[stackIndex], stackIndex)
 
-    def move(self, actions):
+    def move(self, action):
         stock = self.getStock()
         waste = self.getWaste()
 
-        if actions[0] == "D":
+        if action[0] == "D":
             if stock.isEmpty() and waste.isEmpty():
                 return "stockEmptyError"
             self.draw()
             self.nbTurns += 1
 
-        elif actions[0] == "S":
+        elif action[0] == "S":
             if waste.getLen() > 0:
                 closestStack = self.getClosestStack(waste.getLastElement(), True)
                 if closestStack != None:
@@ -60,9 +60,9 @@ class Game(Board):
             else:
                 return "stockTopCardError"
 
-        elif actions[0] == "F":
+        elif action[0] == "F":
             foundation = self.getFoundation()
-            stackSource = foundation[actions[1]]
+            stackSource = foundation[action[1]]
             if stackSource.getLen() > 0:
                 card = stackSource.getLastElement()
                 closestStack = self.getClosestStack(card, True)
@@ -78,12 +78,12 @@ class Game(Board):
                 return "stackDestError"
             return "foundationStackSourceError"
 
-        elif actions[0] == "T":
+        elif action[0] == "T":
             table = self.getTable()
-            tableIndex = actions[1]
+            tableIndex = action[1]
             stackSource = table[tableIndex]
             if stackSource.getLen() > 0:
-                cardIndex = actions[2]
+                cardIndex = action[2]
                 if cardIndex < stackSource.getLen():
                     list = stackSource.getListFromStack(cardIndex)
                     closestStack = self.getClosestStack(list[0], len(list) == 1)
@@ -102,6 +102,7 @@ class Game(Board):
                     return "tableStackSourceIndexError"
             else:
                 return "tableStackSourceEmptyError"
+            self.appendHistory(action)
 
     def draw(self):
         stock = self.getStock()
