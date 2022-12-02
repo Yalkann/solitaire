@@ -2,7 +2,7 @@ import unittest
 from src.Deck import *
 
 
-class TestDeck(unittest.TestCase):
+class UnittestDeck(unittest.TestCase):
     def setUp(self):
         self.d = Deck()
 

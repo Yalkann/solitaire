@@ -2,19 +2,34 @@ import unittest
 from src.Card import *
 
 
-class TestStack(unittest.TestCase):
-    def setUp(self):
-        self.correctCard = Card(2, "Spades")
-        self.incorrectCard1 = Card(0, "Spades")
-        self.incorrectCard2 = Card(2, "Inorrect_suite")
-        self.incorrectCard3 = Card(0, "Incorrect_suite")
-        self.cards = [
-            self.correctCard,
-            self.incorrectCard1,
-            self.incorrectCard2,
-            self.incorrectCard3,
-        ]
-
+class UnittestCard(unittest.TestCase):
     def test_is_instance_of_card(self):
-        for card in self.cards:
-            self.assertIsInstance(card, Card, "cards should be of instance Card.")
+        self.assertIsInstance(
+            Card(2, "Spades"), Card, "cards should be of instance Card."
+        )
+
+    def test_cannot_create_illegal_cards(self):
+        with self.assertRaises(Exception):
+            Card(2, "Incorrect_Suite"), "Cards suites should be in {}".format(*SUITES)
+            Card(0, "Spades"), "Cards values should be in 1-13"
+
+    def test_card_suite_is_correct(self):
+        self.assertEquals(
+            Card(2, "Spades").getSuite(),
+            "Spades",
+            "Cards suites should be the same as the suite defined during creation.",
+        )
+
+    def test_card_value_is_correct(self):
+        self.assertEqual(
+            Card(2, "Spades").getValue(),
+            2,
+            "Cards values should be the same as the value defined during creation.",
+        )
+
+    def test_card_is_correct(self):
+        self.assertEqual(
+            Card(2, "Spades").getCard(),
+            (2, "Spades"),
+            "Cards values and suites should be the same as those defined during creation.",
+        )

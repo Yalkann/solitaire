@@ -13,7 +13,7 @@ class Board:
         self.waste = Stack([])
         self.history = []
         self.nbTurns = 0
-        self.startTime = perf_counter()
+        self.startTime = None
         self.gameTime = None
 
         for i in range(7):
@@ -24,6 +24,9 @@ class Board:
                 self.hiddenTable[i].append(True)
             self.table[i].add(cards)
             self.hiddenTable[i][-1] = False
+
+    def setStartTime(self):
+        self.startTime = perf_counter()
 
     def setGameTime(self):
         endTime = perf_counter()
@@ -39,6 +42,8 @@ class Board:
         return self.history
 
     def appendHistory(self, action):
+        if len(self.history) == 0:
+            self.setStartTime()
         self.history.append(action)
 
     def removeFromHiddenTable(self, tableIndex, cardIndex):

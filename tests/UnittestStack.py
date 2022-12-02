@@ -3,21 +3,23 @@ import random as rd
 from src.Stack import *
 
 
-class TestStack(unittest.TestCase):
+class UnittestStack(unittest.TestCase):
     def setUp(self):
+        rd.seed(10)
         self.l = [rd.randint(0, 99) for _ in range(100)]
-        self.s = Stack(self.l)
 
     def tearDown(self):
-        self.s.__init__(self.l)
+        Stack(self.l).__init__(self.l)
 
     def test_is_instance_of_stack(self):
-        self.assertIsInstance(self.s, Stack, "Stacks should be an instance of Stack.")
+        self.assertIsInstance(
+            Stack(self.l), Stack, "Stacks should be an instance of Stack."
+        )
 
     def test_get_stack_list_returns_whole_stack_list(self):
         self.assertEqual(
             self.l,
-            self.s.getListFromStack(0),
+            Stack(self.l).getListFromStack(0),
             "Stack lists should be equal to the list the stack was created from.",
         )
 
@@ -25,38 +27,39 @@ class TestStack(unittest.TestCase):
         id = rd.randint(0, 99)
         self.assertEqual(
             self.l[id::],
-            self.s.getListFromStack(id),
+            Stack(self.l).getListFromStack(id),
             "Stack sub-lists should be equal to the original sub-list starting from the same index.",
         )
 
     def test_get_stack_sub_list_with_incorrect_index(self):
         with self.assertRaises(IndexError):
-            self.s.getListFromStack(
+            Stack(self.l).getListFromStack(
                 100
             ), "Index should be greater than or equal to 0 and smaller than the stack's length."
-            self.getStack(
+            Stack(self.l).getListFromStack(
                 -1
             ), "Index should be greater than or equal to 0 and smaller than the stack's length"
 
     def test_get_stack_sub_list_from_empty_stack(self):
         s = Stack([])
-        self.assertEqual(s.getListFromStack(0), [], "Should get an empty list")
+        self.assertEqual(s.getListFromStack(0), [], "Should get an empt y list")
 
     def test_remove_from_stack(self):
         id = rd.randint(0, 99)
-        self.s.remove(id)
+        s = Stack(self.l)
+        s.remove(id)
         self.assertEqual(
             self.l[0:id],
-            self.s.getListFromStack(0),
+            s.getListFromStack(0),
             "Stack sub-lists should be equal to the original sub-list ending at the same index.",
         )
 
     def test_remove_from_stack_with_incorrect_index(self):
         with self.assertRaises(IndexError):
-            self.s.remove(
+            Stack(self.l).remove(
                 100
             ), "Index should be greater than or equal to 0 and smaller than the stack's length."
-            self.remove(
+            Stack(self.l).remove(
                 -1
             ), "Index should be greater than or equal to 0 and smaller than the stack's length"
 
@@ -66,5 +69,10 @@ class TestStack(unittest.TestCase):
             s.remove(0), "Cannot remove a stack sub-list from an empty stack."
 
     def test_is_empty_stack(self):
-        self.s.remove(0)
-        self.assertTrue(self.s.isEmpty(), "Stack should be empty.")
+        s = Stack(self.l)
+        s.remove(0)
+        self.assertTrue(s.isEmpty(), "Stack should be empty.")
+        self.assertFalse(
+            Stack(self.l).isEmpty(),
+            "Stacks containing at least one element should not be empty.",
+        )
