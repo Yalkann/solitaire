@@ -31,3 +31,9 @@ class Card:
 
     def getSuite(self):
         return self.suite
+
+    def getColor(self):
+        if self.suite in RED:
+            return "red"
+        else:
+            return "black"

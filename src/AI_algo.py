@@ -1,11 +1,12 @@
 from src.AI import *
-from time import sleep
 
 
 class AI_algo(AI):
     def __init__(self):
         self.boardChanged = True
         self.consecutiveDraw = 0
+        self.redKingsLeft = 2
+        self.blackKingsLeft = 2
 
     def hasBoardChanged(self):
         return self.boardChanged
@@ -33,6 +34,67 @@ class AI_algo(AI):
                 ):
                     return True
         return False
+
+    def setRedKingsLeft(self, number):
+        self.redKingsLeft = number
+
+    def setBlackKingsLeft(self, number):
+        self.blackKingsLeft = number
+
+    def getKingsLeft(self):
+        return (self.redKingsLeft, self.blackKingsLeft)
+
+    def updateKingsLeft(self, game: Game):
+        pass
+
+    def getOptimalKingColor(self, game: Game):
+        table = game.getTable()
+        hiddenTable = game.getHiddenTable()
+        scoreLayout = [None for _ in table]
+        redKing = 0
+        blackKing = 0
+
+        for stackIndex, stack in enumerate(table):
+            hiddenCount = 0
+            stackList = stack.getListFromStack(0)
+            for hidden, card in zip(hiddenTable[stackIndex], stackList):
+                if hidden:
+                    hiddenCount += 1
+                else:
+                    value, suite = card.getCard()
+                    if suite in RED:
+                        if value % 2 == 0:
+                            kingNeeded = BLACK
+                        else:
+                            kingNeeded = RED
+                    else:
+                        if value % 2 == 0:
+                            kingNeeded = RED
+                        else:
+                            kingNeeded = BLACK
+                    distanceToKing = 13 - value
+                    scoreLayout[stackIndex] = [kingNeeded, distanceToKing, hiddenCount]
+                    break
+
+        redKingsLeft, blackKingsLeft = self.getKingsLeft()
+        for score in scoreLayout:
+            if score != None:
+                if score[1] != 0:
+                    if score[0] == RED:
+                        redKing += (score[2] / (score[1] + 1)) * redKingsLeft
+                    else:
+                        blackKing += score[2] / (score[1] + 1) * blackKingsLeft
+
+        game.printBoard()
+        print("\n\n------------------------------")
+        print(f"redKingScore: {redKing}\nblackKingScore: {blackKing}\n\n")
+
+        if redKing == 0 and blackKing == 0:
+            return RED + BLACK
+        if redKing > blackKing:
+            return RED
+        else:
+            return BLACK
 
     def getShrinkingActions(self, game: Game):
         table = game.getTable()
@@ -96,8 +158,6 @@ class AI_algo(AI):
         stock = game.getStock()
         waste = game.getWaste()
         action = None
-        # sleep(0.01)
-        # print("\nConsec Draw:", self.getConsecutiveDraw(), "\n")
 
         if waste.isEmpty() and not (stock.isEmpty()):
             action = ["D", None, None]
@@ -111,13 +171,18 @@ class AI_algo(AI):
                 self.resetConsecutiveDraw()
                 return tableAction
 
-        card = waste.getLastElement()
+        card: Card = waste.getLastElement()
         if card != None:
+            self.updateKingsLeft(game)
             closestStack = game.getClosestStack(card, True)
-            if closestStack == None:
+            if closestStack == None or (
+                card.getValue() == 13
+                and card.getSuite() not in self.getOptimalKingColor(game)
+            ):
                 action = ["D", None, None]
                 self.setBoardChanged(False)
                 self.incrConsecutiveDraw()
+
             else:
                 action = ["S", None, None]
                 self.setBoardChanged(True)
