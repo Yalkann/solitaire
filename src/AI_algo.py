@@ -41,57 +41,92 @@ class AI_algo(AI):
     def setBlackKingsLeft(self, number):
         self.blackKingsLeft = number
 
-    def getKingsLeft(self):
-        return (self.redKingsLeft, self.blackKingsLeft)
+    def getKingsLeft(self, game: Game):
+        table = game.getTable()
+        foundation = game.getFoundation()
+        hiddenTable = game.getHiddenTable()
+        redKingsLeft = 2
+        blackKingsLeft = 2
 
-    def updateKingsLeft(self, game: Game):
-        pass
+        for stackIndex, stack in enumerate(table):
+            stackList = stack.getListFromStack(0)
+            for hidden, card in zip(hiddenTable[stackIndex], stackList):
+                if not (hidden):
+                    value, suite = card.getCard()
+                    if suite in RED:
+                        if value == 13:
+                            redKingsLeft -= 1
+                    else:
+                        if value == 13:
+                            blackKingsLeft -= 1
+                    break
+        for stack in foundation:
+            card: Card = stack.getLastElement()
+            if card != None and card.getValue() == 13:
+                if card.getSuite() in RED:
+                    redKingsLeft -= 1
+                else:
+                    blackKingsLeft -= 1
+
+        return (redKingsLeft, blackKingsLeft)
 
     def getOptimalKingColor(self, game: Game):
         table = game.getTable()
         hiddenTable = game.getHiddenTable()
         scoreLayout = [None for _ in table]
-        redKing = 0
-        blackKing = 0
+        emptySpots = 0
+        redKingScore = 0
+        blackKingScore = 0
 
         for stackIndex, stack in enumerate(table):
             hiddenCount = 0
             stackList = stack.getListFromStack(0)
+            if stack.isEmpty():
+                emptySpots += 1
             for hidden, card in zip(hiddenTable[stackIndex], stackList):
                 if hidden:
                     hiddenCount += 1
                 else:
                     value, suite = card.getCard()
-                    if suite in RED:
-                        if value % 2 == 0:
-                            kingNeeded = BLACK
+                    if value != 13:
+                        if suite in RED:
+                            if value % 2 == 0:
+                                kingNeeded = BLACK
+                            else:
+                                kingNeeded = RED
                         else:
-                            kingNeeded = RED
-                    else:
-                        if value % 2 == 0:
-                            kingNeeded = RED
-                        else:
-                            kingNeeded = BLACK
-                    distanceToKing = 13 - value
-                    scoreLayout[stackIndex] = [kingNeeded, distanceToKing, hiddenCount]
-                    break
+                            if value % 2 == 0:
+                                kingNeeded = RED
+                            else:
+                                kingNeeded = BLACK
+                        distanceToKing = 13 - value
+                        scoreLayout[stackIndex] = [
+                            kingNeeded,
+                            distanceToKing,
+                            hiddenCount,
+                        ]
+                        break
 
-        redKingsLeft, blackKingsLeft = self.getKingsLeft()
+        redKingsLeft, blackKingsLeft = self.getKingsLeft(game)
         for score in scoreLayout:
             if score != None:
                 if score[1] != 0:
                     if score[0] == RED:
-                        redKing += (score[2] / (score[1] + 1)) * redKingsLeft
+                        redKingScore += (score[2] / score[1]) * redKingsLeft
                     else:
-                        blackKing += score[2] / (score[1] + 1) * blackKingsLeft
+                        blackKingScore += (score[2] / score[1]) * blackKingsLeft
 
         game.printBoard()
         print("\n\n------------------------------")
-        print(f"redKingScore: {redKing}\nblackKingScore: {blackKing}\n\n")
+        print(f"redKingScore: {redKingScore}\nblackKingScore: {blackKingScore}\n\n")
 
-        if redKing == 0 and blackKing == 0:
+        if (
+            redKingScore == 0
+            and blackKingScore == 0
+            or (redKingsLeft + blackKingsLeft <= emptySpots)
+        ):
             return RED + BLACK
-        if redKing > blackKing:
+        if redKingScore > blackKingScore:
             return RED
         else:
             return BLACK
@@ -173,7 +208,7 @@ class AI_algo(AI):
 
         card: Card = waste.getLastElement()
         if card != None:
-            self.updateKingsLeft(game)
+            # self.updateKingsLeft(game)
             closestStack = game.getClosestStack(card, True)
             if closestStack == None or (
                 card.getValue() == 13

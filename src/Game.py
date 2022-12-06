@@ -102,7 +102,7 @@ class Game(Board):
                     return "tableStackSourceIndexError"
             else:
                 return "tableStackSourceEmptyError"
-            self.appendHistory(action)
+        self.appendHistory(action)
 
     def draw(self):
         stock = self.getStock()
