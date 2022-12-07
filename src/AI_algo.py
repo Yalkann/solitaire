@@ -116,10 +116,6 @@ class AI_algo(AI):
                     else:
                         blackKingScore += (score[2] / score[1]) * blackKingsLeft
 
-        game.printBoard()
-        print("\n\n------------------------------")
-        print(f"redKingScore: {redKingScore}\nblackKingScore: {blackKingScore}\n\n")
-
         if (
             redKingScore == 0
             and blackKingScore == 0
@@ -186,8 +182,16 @@ class AI_algo(AI):
         enablingActions = self.getEnablingActions(game)
 
         tableActions = shrinkingActions + revealingActions + enablingActions
+
         if len(tableActions) > 0:
-            return tableActions[0]
+            hiddenCount = []
+            hiddenTable = game.getHiddenTable()
+
+            for action in tableActions:
+                hiddenCount.append(sum(hiddenTable[action[1]][0 : action[2]]))
+
+            optimalActionIndex = hiddenCount.index(max(hiddenCount))
+            return tableActions[optimalActionIndex]
 
     def getTurnAction(self, game: Game):
         stock = game.getStock()
@@ -208,7 +212,6 @@ class AI_algo(AI):
 
         card: Card = waste.getLastElement()
         if card != None:
-            # self.updateKingsLeft(game)
             closestStack = game.getClosestStack(card, True)
             if closestStack == None or (
                 card.getValue() == 13
@@ -225,7 +228,7 @@ class AI_algo(AI):
         else:
             return None
 
-        if self.getConsecutiveDraw() >= stock.getDeckLen() + waste.getLen() + 1:
+        if self.getConsecutiveDraw() > stock.getDeckLen() + waste.getLen() + 1:
             return None
 
         return action
