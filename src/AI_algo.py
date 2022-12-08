@@ -33,6 +33,9 @@ class AI_algo(AI):
                     and lastCard.getValue() == card.getValue() - 1
                 ):
                     return True
+            elif card.getValue() == 1:
+                return True
+
         return False
 
     def setRedKingsLeft(self, number):
@@ -127,18 +130,18 @@ class AI_algo(AI):
         else:
             return BLACK
 
-    def getShrinkingActions(self, game: Game):
+    def getReducingActions(self, game: Game):
         table = game.getTable()
         foundation = game.getFoundation()
-        shrinkingActions = []
+        reducingActions = []
 
         for tableIndex in range(len(table)):
             stackSource = table[tableIndex]
             if stackSource.getLen() > 0:
                 card: Card = stackSource.getLastElement()
                 if self.canSendToFoundation(foundation, card):
-                    shrinkingActions.append(["T", tableIndex, stackSource.getLen() - 1])
-        return shrinkingActions
+                    reducingActions.append(["T", tableIndex, stackSource.getLen() - 1])
+        return reducingActions
 
     def getRevealingActions(self, game: Game):
         table = game.getTable()
@@ -152,7 +155,7 @@ class AI_algo(AI):
                 cardIndex = hiddenStack.index(False)
                 list = stackSource.getListFromStack(cardIndex)
                 if not (cardIndex == 0 and list[0].getValue() == 13):
-                    stackDest = game.getClosestStack(list[0], len(list) == 1)
+                    stackDest = game.getClosestStack(list[0], len(list) == 1, True)
                     if stackDest != None:
                         revealingActions.append(["T", tableIndex, cardIndex])
         return revealingActions
@@ -168,7 +171,7 @@ class AI_algo(AI):
                 if not (game.isHidden(tableIndex, cardIndex - 1)):
                     enablingList = stackSource.getListFromStack(cardIndex)
                     closestStack = game.getClosestStack(
-                        enablingList[0], len(enablingList) == 1
+                        enablingList[0], len(enablingList) == 1, True
                     )
                     if closestStack != None and self.canSendToFoundation(
                         foundation, stackSource.getListFromStack(cardIndex - 1)[0]
@@ -176,22 +179,45 @@ class AI_algo(AI):
                         enablingActions.append(["T", tableIndex, cardIndex])
         return enablingActions
 
+    def getOptimalRevealingAction(self, game: Game, actions):
+        hiddenCount = []
+        hiddenTable = game.getHiddenTable()
+
+        for action in actions:
+            hiddenCount.append(sum(hiddenTable[action[1]][0 : action[2]]))
+
+        optimalRevealingActionIndex = hiddenCount.index(max(hiddenCount))
+        return actions[optimalRevealingActionIndex]
+
+    def getOptimalReducingAction(self, actions):
+        stackSizes = []
+
+        for action in actions:
+            stackSizes.append(action[2])
+
+        optimalEnablingActionIndex = stackSizes.index(min(stackSizes))
+        return actions[optimalEnablingActionIndex]
+
+    def getOptimalEnablingAction(self, actions):
+        stackSizes = []
+
+        for action in actions:
+            stackSizes.append(action[2])
+
+        optimalEnablingActionIndex = stackSizes.index(max(stackSizes))
+        return actions[optimalEnablingActionIndex]
+
     def getTableAction(self, game: Game):
-        shrinkingActions = self.getShrinkingActions(game)
+        reducingActions = self.getReducingActions(game)
         revealingActions = self.getRevealingActions(game)
         enablingActions = self.getEnablingActions(game)
 
-        tableActions = shrinkingActions + revealingActions + enablingActions
-
-        if len(tableActions) > 0:
-            hiddenCount = []
-            hiddenTable = game.getHiddenTable()
-
-            for action in tableActions:
-                hiddenCount.append(sum(hiddenTable[action[1]][0 : action[2]]))
-
-            optimalActionIndex = hiddenCount.index(max(hiddenCount))
-            return tableActions[optimalActionIndex]
+        if len(revealingActions) > 0:
+            return self.getOptimalRevealingAction(game, revealingActions)
+        if len(reducingActions) > 0:
+            return self.getOptimalReducingAction(reducingActions)
+        if len(enablingActions) > 0:
+            return self.getOptimalEnablingAction(enablingActions)
 
     def getTurnAction(self, game: Game):
         stock = game.getStock()

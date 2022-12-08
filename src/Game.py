@@ -10,30 +10,42 @@ class Game(Board):
             and card2.getSuite() in RED
         )
 
-    def getClosestStack(self, card: Card, isSingle):
-        if isSingle:
-            for stack in self.getFoundation():
-                if stack.getLen() == 0:
-                    if card.getValue() == 1:
-                        return (stack, None)
-                else:
-                    lastCard: Card = stack.getLastElement()
-                    if (
-                        card.getValue() == lastCard.getValue() + 1
-                        and card.getSuite() == lastCard.getSuite()
-                    ):
-                        return (stack, None)
-        table = self.getTable()
-        for stackIndex in range(len(table)):
-            if table[stackIndex].getLen() == 0:
-                if card.getValue() == 13:
-                    return (table[stackIndex], stackIndex)
+    def getClosestFoundationStack(self, card: Card):
+        for stack in self.getFoundation():
+            if stack.getLen() == 0:
+                if card.getValue() == 1:
+                    return (stack, None)
             else:
-                lastCard = table[stackIndex].getLastElement()
-                if card.getValue() == lastCard.getValue() - 1 and self.areOppositeColor(
-                    card, lastCard
+                lastCard: Card = stack.getLastElement()
+                if (
+                    card.getValue() == lastCard.getValue() + 1
+                    and card.getSuite() == lastCard.getSuite()
                 ):
-                    return (table[stackIndex], stackIndex)
+                    return (stack, None)
+
+    def getClosestStack(self, card: Card, isSingle, prioToTable=False):
+        closestStack = None
+        if isSingle and not (prioToTable):
+            closestStack = self.getClosestFoundationStack(card)
+
+        if closestStack == None:
+            table = self.getTable()
+            for stackIndex in range(len(table)):
+                if table[stackIndex].getLen() == 0:
+                    if card.getValue() == 13:
+                        closestStack = (table[stackIndex], stackIndex)
+                else:
+                    lastCard = table[stackIndex].getLastElement()
+                    if (
+                        card.getValue() == lastCard.getValue() - 1
+                        and self.areOppositeColor(card, lastCard)
+                    ):
+                        closestStack = (table[stackIndex], stackIndex)
+
+        if closestStack == None and isSingle:
+            closestStack = self.getClosestFoundationStack(card)
+
+        return closestStack
 
     def draw(self):
         stock = self.getStock()
@@ -62,7 +74,7 @@ class Game(Board):
     def stockMove(self):
         waste = self.getWaste()
         if waste.getLen() > 0:
-            closestStack = self.getClosestStack(waste.getLastElement(), True)
+            closestStack = self.getClosestStack(waste.getLastElement(), True, True)
             if closestStack != None:
                 stackDest = closestStack[0]
                 hiddenTableIndex = closestStack[1]
@@ -119,17 +131,19 @@ class Game(Board):
     def move(self, action):
 
         if action[0] == "D":
-            self.drawMove()
+            moveError = self.drawMove()
         elif action[0] == "S":
-            self.stockMove()
+            moveError = self.stockMove()
         elif action[0] == "F":
-            self.foundationMove(action)
+            moveError = self.foundationMove(action)
         elif action[0] == "T":
-            self.tableMove(action)
+            moveError = self.tableMove(action)
         else:
-            return "actionError"
+            moveError = "actionError"
 
-        self.appendHistory(action)
+        if moveError == None:
+            self.appendHistory(action)
+        return moveError
 
     def isWon(self):
         for stack in self.getFoundation():

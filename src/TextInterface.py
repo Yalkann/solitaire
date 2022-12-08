@@ -13,6 +13,7 @@ class TextInterface(Interface):
                     game.printBoard()
                     action = tm.getTurnAction(game)
                 else:
+                    # game.printBoard()
                     action = ai.getTurnAction(game)
                 if action == None:
                     finished = True
@@ -22,10 +23,10 @@ class TextInterface(Interface):
                 if moveError != None:
                     print(moveError, ": illegal Move.", sep="")
 
-        game.printBoard()
+        # game.printBoard()
         if game.isWon():
-            print("\nGG\n")
+            # print("\nGG\n")
             return True
         else:
-            print("\nDOMMAGE\n")
+            # print("\nDOMMAGE\n")
             return False

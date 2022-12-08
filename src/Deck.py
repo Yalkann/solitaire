@@ -16,6 +16,9 @@ class Deck:
             str += "(" + str(c[0]) + "," + str(c[1]) + ")" + "\n"
         return str
 
+    def setShuffleSeed(self, seed):
+        rd.seed(seed)
+
     def shuffle(self):
         rd.shuffle(self.deck)
 

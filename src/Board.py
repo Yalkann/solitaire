@@ -1,6 +1,6 @@
 from src.Deck import *
 from src.Stack import *
-from time import perf_counter
+from time import perf_counter, sleep
 
 
 class Board:
@@ -24,6 +24,9 @@ class Board:
                 self.hiddenTable[i].append(True)
             self.table[i].add(cards)
             self.hiddenTable[i][-1] = False
+
+    def setDeckSeed(self, seed):
+        self.stock.setShuffleSeed(seed)
 
     def setStartTime(self):
         self.startTime = perf_counter()
@@ -92,6 +95,7 @@ class Board:
             )
 
     def printBoard(self):
+        # sleep(1)
         print("\n")
         print("Turn", self.getNbTurns())
 
